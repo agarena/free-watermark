@@ -508,9 +508,15 @@
     });
     on('#btnAiNotice', 'click', () => {
       const t = $('#textText');
-      t.value = P.AI_NOTICE;
+      if (t.value.includes(P.AI_NOTICE)) {
+        // 已包含声明 → 摘掉（并清理接缝处的多余换行）
+        t.value = t.value.replace('\n' + P.AI_NOTICE, '').replace(P.AI_NOTICE, '').replace(/^\n+/, '');
+        U.toast('已移除防AI声明');
+      } else {
+        t.value = t.value ? t.value + '\n' + P.AI_NOTICE : P.AI_NOTICE;
+        U.toast('已追加防AI声明，再次点击可移除');
+      }
       t.dispatchEvent(new Event('input'));
-      U.toast('已填入防AI声明，可在文本框里继续修改');
     });
     bindToggle('#strokeOn', v => { state.config.text.stroke.enabled = v; $('#strokeRow').hidden = !v; });
     on('#strokeColor', 'input', e => { state.config.text.stroke.color = e.target.value; markCustom(); schedulePreview(); });
