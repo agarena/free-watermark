@@ -1,5 +1,8 @@
 # 免费打水印 · 批量图片视频水印工具
 
+**在线使用**：https://agarena.github.io/free-watermark/ （GitHub Pages 托管，打开即用）
+**仓库地址**：https://github.com/agarena/free-watermark
+
 纯静态网页工具：上传多张图片和视频，一键批量叠加文字 / PNG 图片水印，全部处理在浏览器本地完成，**文件不上传任何服务器**。
 
 双击 `index.html` 即可使用，无需安装、无需联网、无任何依赖。
