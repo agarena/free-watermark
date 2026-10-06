@@ -133,7 +133,10 @@
                 <label>字体</label>
                 <select id="textFont"></select>
               </div>
-              <button id="btnCopyright" class="tool-btn" title="插入版权符号">©</button>
+              <div class="btn-duo">
+                <button id="btnAiNotice" class="tool-btn" title="一键填入防AI声明文字（填入后可自由修改）">🤖</button>
+                <button id="btnCopyright" class="tool-btn" title="插入版权符号">©</button>
+              </div>
             </div>
             <div class="field">
               <label>字号（占图片尺寸 %）<output id="textSizeOut">5.0</output></label>
@@ -331,6 +334,16 @@
           <p class="hint-line">不定时跳到随机位置：停留间隔与落点都带随机，避免被按规律定位去除。</p>
         </div>
         <p class="foot-note">视频为实时录制导出（1 分钟视频约需 1 分钟），输出 MP4 或 WebM 视浏览器支持；导出设置中的格式 / 尺寸 / 质量仅对图片生效。</p>
+      </div>
+    </details>
+
+    <!-- 防AI融图 -->
+    <details class="section" open>
+      <summary><span class="sec-ico">🛡️</span>防AI融图<span class="sec-tag" id="noiseTag">关</span></summary>
+      <div class="sec-body">
+        <label class="mini-check"><input type="checkbox" id="noiseEnabled"><span>全图叠加防AI细噪点</span></label>
+        <p class="hint-line">叠加人眼几乎不可见的随机噪点，干扰 AI 用你的图做二次生成（融图 / 换脸 / 图生图）时的画质，并轻微干扰 OCR 文字提取；图片和视频导出均生效。</p>
+        <p class="hint-line">效果有限：只能降低 AI 产出质量，无法绝对阻止；截图、高强度重绘等手段仍可绕过。可在「水印内容」点 🤖 填入防AI声明文字配合使用。</p>
       </div>
     </details>
 

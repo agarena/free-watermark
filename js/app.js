@@ -506,6 +506,12 @@
       t.value = (t.value + ' ©').trim();
       t.dispatchEvent(new Event('input'));
     });
+    on('#btnAiNotice', 'click', () => {
+      const t = $('#textText');
+      t.value = P.AI_NOTICE;
+      t.dispatchEvent(new Event('input'));
+      U.toast('已填入防AI声明，可在文本框里继续修改');
+    });
     bindToggle('#strokeOn', v => { state.config.text.stroke.enabled = v; $('#strokeRow').hidden = !v; });
     on('#strokeColor', 'input', e => { state.config.text.stroke.color = e.target.value; markCustom(); schedulePreview(); });
     on('#strokeWidth', 'input', e => { state.config.text.stroke.width = +e.target.value; markCustom(); schedulePreview(); });
@@ -580,6 +586,13 @@
     // —— 通用 ——
     bindRange('#opacity', v => state.config.layout.opacity = v, '#opacityOut', v => String(Math.round(v)));
     bindRange('#rotate', v => state.config.layout.rotate = v, '#rotateOut', v => String(Math.round(v)));
+
+    // —— 防AI防护 ——
+    on('#noiseEnabled', 'change', e => {
+      state.config.noise.enabled = e.target.checked;
+      $('#noiseTag').textContent = e.target.checked ? '开' : '关';
+      markCustom(); schedulePreview();
+    });
   }
 
   function bindRange(id, set, outId, fmt = v => String(Math.round(v)), step) {
@@ -649,8 +662,10 @@
     const preset = P.PRESETS.find(p => p.id === id);
     if (!preset) return;
     const keepVideo = state.config.video; // 视频运动设置不属于画面样式
+    const keepNoise = state.config.noise; // 防AI防护是全局开关，不随样式预设重置
     const cfg = P.apply(preset, state.config);
     cfg.video = keepVideo;
+    cfg.noise = keepNoise;
     state.config = cfg;
     state.presetId = id;
     state.configRev++;
@@ -868,6 +883,9 @@
     setRange('#vidHop', V.hopInterval, '#vidHopOut', v => String(Math.round(v)));
     $('#vidHopSmooth').checked = V.hopSmooth;
     syncVideoPanels();
+
+    $('#noiseEnabled').checked = state.config.noise.enabled;
+    $('#noiseTag').textContent = state.config.noise.enabled ? '开' : '关';
 
     setRange('#opacity', L.opacity, '#opacityOut', v => String(Math.round(v)));
     setRange('#rotate', L.rotate, '#rotateOut', v => String(Math.round(v)));

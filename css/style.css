@@ -135,6 +135,8 @@ body {
 .tool-btn:disabled { opacity: .4; cursor: not-allowed; }
 .tool-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-weak); }
 
+.btn-duo { display: flex; gap: 6px; }
+
 .text-btn {
   border: none; background: none; color: var(--danger);
   font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 4px;

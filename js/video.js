@@ -290,6 +290,7 @@ WM.video = (function () {
     const drawFrame = t => {
       ctx.drawImage(ve, 0, 0, W, H);
       if (cell) stamp(ctx, cell, positionFor(cfg, item, t, cell, W, H), cfg);
+      if (cfg.noise?.enabled) R.applyNoise(ctx, W, H);
     };
     try { drawFrame(0); } catch (e) { /* 首帧未就绪，播放后接管 */ }
 

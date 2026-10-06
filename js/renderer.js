@@ -307,6 +307,38 @@ WM.renderer = (function () {
     }
   }
 
+  /* ══════════ 防AI细噪点 ══════════ */
+  /* 灰色随机噪点以 overlay 混合叠加：128 灰是该混合模式的中性色，
+     ±6 级随机偏差等效于画面 ±2~9 级亮度扰动，肉眼几乎不可见，
+     但能劣化 AI 低强度二次生成（溶图）与 OCR 的输入。
+     噪点砖与 pattern 只生成一次，全尺寸画布填充走 GPU，开销可忽略。 */
+  let noisePattern = null;
+  function getNoisePattern(ctx) {
+    if (!noisePattern) {
+      const tile = document.createElement('canvas');
+      tile.width = tile.height = 256;
+      const nctx = tile.getContext('2d');
+      const img = nctx.createImageData(256, 256);
+      const d = img.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = 128 + ((Math.random() * 13) | 0) - 6;
+        d[i] = d[i + 1] = d[i + 2] = v;
+        d[i + 3] = 255;
+      }
+      nctx.putImageData(img, 0, 0);
+      noisePattern = ctx.createPattern(tile, 'repeat');
+    }
+    return noisePattern;
+  }
+
+  function applyNoise(ctx, W, H) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.fillStyle = getNoisePattern(ctx);
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
   /* ══════════ 主入口 ══════════ */
 
   /**
@@ -324,6 +356,11 @@ WM.renderer = (function () {
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(image.canvas, 0, 0);
     if (opts.withWatermark === false) return out;
+
+    const finish = () => {
+      if (config.noise?.enabled) applyNoise(ctx, W, H);
+      return out;
+    };
 
     const L = config.layout;
 
@@ -343,11 +380,11 @@ WM.renderer = (function () {
 
     if (L.mode === 'bar') {
       drawBar(ctx, W, H, image, effConfig);
-      return out;
+      return finish();
     }
 
     const cell = buildCell(image, effConfig);
-    if (!cell) return out;
+    if (!cell) return finish();
 
     if (L.mode === 'single') {
       drawSingle(ctx, W, H, cell, L);
@@ -356,7 +393,7 @@ WM.renderer = (function () {
     } else if (L.mode === 'random') {
       drawRandom(ctx, W, H, cell, L, U.hashString(image.id + '|' + (image.name || '')));
     }
-    return out;
+    return finish();
   }
 
   /* 供拖拽命中测试：单个模式下水印的中心位置与尺寸 */
@@ -374,5 +411,5 @@ WM.renderer = (function () {
     };
   }
 
-  return { render, singleHitRect, getBrightness, buildCell, anchorPoint };
+  return { render, singleHitRect, getBrightness, buildCell, anchorPoint, applyNoise };
 })();
