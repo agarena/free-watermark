@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>免费打水印 · 批量图片视频水印工具</title>
+<meta name="description" content="免费打水印——纯本地批量图片视频水印工具：文字 / PNG 水印、平铺防盗、漂浮水印、机型参数条等预设，文件不上传、无需联网。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'%3E水%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══════════ 顶栏 ═══════════ -->
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-logo" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="14" fill="var(--accent)"/>
+      <text x="32" y="43" font-size="30" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="700">水</text>
+    </svg>
+    <div class="brand-text">
+      <h1>免费打水印</h1>
+      <span>图片视频批量加水印 · 本地处理 · 无需联网</span>
+    </div>
+  </div>
+  <div class="top-actions">
+    <span class="privacy-badge" title="所有图片和视频仅在你的浏览器内处理，不会上传到任何服务器">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 0 1 6 0v3H9z"/></svg>
+      仅在本设备处理，无需联网
+    </span>
+    <button id="btnTheme" class="icon-btn" title="切换深浅色" aria-label="切换深浅色">
+      <svg class="ico-sun" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.5 4.9 4.9 3.5l2.1 2.1-1.4 1.4L3.5 4.9zm13.5 13.5 1.4-1.4 2.1 2.1-1.4 1.4-2.1-2.1zM1 11h3v2H1v-2zm19 0h3v2h-3v-2zM3.5 19.1l2.1-2.1 1.4 1.4-2.1 2.1-1.4-1.4zM17 5.6l2.1-2.1 1.4 1.4-2.1 2.1L17 5.6z"/></svg>
+      <svg class="ico-moon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.1 22c-5.5 0-10-4.5-10-10 0-4.3 2.7-8 6.6-9.4.6-.2 1.2.2 1.3.8.1.4 0 .8-.3 1.1-.9.9-1.4 2.1-1.4 3.4 0 2.6 2.1 4.7 4.7 4.7 1.3 0 2.5-.5 3.4-1.4.3-.3.7-.4 1.1-.3.6.1 1 .7.8 1.3C17.1 19 14.5 22 12.1 22z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════ 主体三栏 ═══════════ -->
+<main class="layout">
+
+  <!-- ── 左栏：上传 + 队列 ── -->
+  <aside class="panel panel-left">
+    <div class="upload-zone" id="dropZone" role="button" tabindex="0" aria-label="上传图片">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+      <p class="uz-main">点击 / 拖拽 / 粘贴上传</p>
+      <p class="uz-sub">图片 JPG / PNG / WebP / GIF · 视频 MP4 / WebM / MOV，可多选、可拖入文件夹</p>
+      <input type="file" id="fileInput" multiple accept="image/*,video/*" hidden>
+    </div>
+
+    <div class="queue-head">
+      <span>图片队列 <em id="queueCount">0</em></span>
+      <button id="btnClearQueue" class="text-btn" hidden>清空</button>
+    </div>
+    <ul class="file-queue" id="fileQueue">
+      <li class="queue-empty" id="queueEmptyHint">还没有图片，先上传几张吧</li>
+    </ul>
+  </aside>
+
+  <!-- ── 中栏：预览 ── -->
+  <section class="panel panel-center">
+    <div class="preview-toolbar">
+      <button id="btnPrevImg" class="icon-btn" title="上一张" aria-label="上一张">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>
+      </button>
+      <span class="cur-label" id="curLabel">—</span>
+      <button id="btnNextImg" class="icon-btn" title="下一张" aria-label="下一张">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4L13.2 12z"/></svg>
+      </button>
+      <span class="toolbar-sep"></span>
+      <button id="btnCompare" class="tool-btn" title="按住查看无水印原图" disabled>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 5c-5 0-9 4.5-10 7 1 2.5 5 7 10 7s9-4.5 10-7c-1-2.5-5-7-10-7zm0 11.5A4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>
+        按住看原图
+      </button>
+      <span class="toolbar-spacer"></span>
+      <button id="btnZoomOut" class="icon-btn" title="缩小" aria-label="缩小">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>
+      </button>
+      <span class="zoom-label" id="zoomLabel">100%</span>
+      <button id="btnZoomIn" class="icon-btn" title="放大" aria-label="放大">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+    </div>
+
+    <div class="preview-stage" id="previewStage">
+      <canvas id="previewCanvas" hidden></canvas>
+      <div class="empty-hint" id="emptyHint">
+        <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><path d="m21 15-5-5L5 21"/></svg>
+        <p>上传图片后在此实时预览水印效果</p>
+        <p class="sub">一切处理都在浏览器本地完成</p>
+      </div>
+      <div class="drag-hint" id="dragHint" hidden>松手添加图片</div>
+    </div>
+
+    <div class="status-bar">
+      <span id="statusText">就绪</span>
+      <span id="statusRight"></span>
+    </div>
+  </section>
+
+  <!-- ── 右栏：配置 ── -->
+  <aside class="panel panel-right">
+
+    <!-- 预设 -->
+    <details class="section" open>
+      <summary><span class="sec-ico">✨</span>样式预设<span class="sec-tag" id="presetTag">斜铺防盗</span></summary>
+      <div class="sec-body">
+        <div class="preset-grid" id="presetGrid"></div>
+        <p class="hint-line">样式预设只更换外观与摆放，不会改动你的文字内容和图片水印。</p>
+        <div class="my-preset-row">
+          <button id="btnSavePreset" class="tool-btn w100">💾 保存全部设置为我的预设</button>
+        </div>
+        <p class="hint-line">「我的预设」是全局快照：文字、字体、字号、颜色、图片水印、视频运动等所有参数都会存下并原样恢复。</p>
+        <div class="preset-grid my" id="myPresetGrid" hidden></div>
+      </div>
+    </details>
+
+    <!-- 水印内容 -->
+    <details class="section" open>
+      <summary><span class="sec-ico">💧</span>水印内容</summary>
+      <div class="sec-body">
+
+        <div class="card">
+          <div class="card-head">
+            <label class="switch-label"><span>文字水印</span>
+              <span class="switch"><input type="checkbox" id="textEnabled" checked><i></i></span>
+            </label>
+          </div>
+          <div class="card-body" id="textCardBody">
+            <div class="field">
+              <textarea id="textText" rows="2" spellcheck="false">@ 我的名字</textarea>
+            </div>
+            <div class="field-row">
+              <div class="field grow">
+                <label>字体</label>
+                <select id="textFont"></select>
+              </div>
+              <button id="btnCopyright" class="tool-btn" title="插入版权符号">©</button>
+            </div>
+            <div class="field">
+              <label>字号（占图片尺寸 %）<output id="textSizeOut">5.0</output></label>
+              <input type="range" id="textSize" min="1" max="20" step="0.5" value="5">
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>颜色</label>
+                <div class="color-wrap">
+                  <input type="color" id="textColor" value="#ffffff">
+                  <label class="mini-check"><input type="checkbox" id="textAutoColor"><span>随画面明暗</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>字重</label>
+                <select id="textWeight">
+                  <option value="300">细</option>
+                  <option value="400">常规</option>
+                  <option value="600" selected>中粗</option>
+                  <option value="900">粗</option>
+                </select>
+              </div>
+            </div>
+            <div class="checks-row">
+              <label class="mini-check"><input type="checkbox" id="textItalic"><span>斜体</span></label>
+              <label class="mini-check"><input type="checkbox" id="strokeOn" checked><span>描边</span></label>
+              <label class="mini-check"><input type="checkbox" id="shadowOn"><span>阴影</span></label>
+              <label class="mini-check"><input type="checkbox" id="bgOn"><span>文字底色</span></label>
+            </div>
+            <div class="field-row collapsible" id="strokeRow">
+              <div class="field grow"><label>描边色</label><input type="color" id="strokeColor" value="#000000"></div>
+              <div class="field"><label>粗细</label><input type="number" id="strokeWidth" min="0" max="10" step="0.5" value="1.5"></div>
+            </div>
+            <div class="field-row collapsible" id="shadowRow" hidden>
+              <div class="field grow"><label>阴影色</label><input type="color" id="shadowColor" value="#000000"></div>
+              <div class="field"><label>模糊</label><input type="number" id="shadowBlur" min="0" max="40" value="8"></div>
+            </div>
+            <div class="field-row collapsible" id="bgRow" hidden>
+              <div class="field grow"><label>底色</label><input type="color" id="bgColor" value="#000000"></div>
+              <div class="field"><label>不透明度 %</label><input type="number" id="bgOpacity" min="0" max="100" value="40"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <label class="switch-label"><span>图片水印（PNG / 头像 / Logo）</span>
+              <span class="switch"><input type="checkbox" id="imgEnabled"><i></i></span>
+            </label>
+          </div>
+          <div class="card-body dim" id="imgCardBody">
+            <div class="img-drop" id="imgDrop" role="button" tabindex="0">
+              <img id="imgWatermarkPreview" alt="水印图片预览" hidden>
+              <span class="img-drop-hint" id="imgDropHint">点击选择 PNG 水印图</span>
+            </div>
+            <input type="file" id="imgInput" accept="image/*" hidden>
+            <div class="field">
+              <label>大小（占图片尺寸 %）<output id="imgScaleOut">12</output></label>
+              <input type="range" id="imgScale" min="2" max="60" step="1" value="12">
+            </div>
+            <div class="field-row">
+              <div class="field grow">
+                <label>形状</label>
+                <select id="imgShape">
+                  <option value="none">原始</option>
+                  <option value="rounded">圆角</option>
+                  <option value="circle">圆形（头像章）</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>与文字间距</label>
+                <input type="number" id="imgMargin" min="0" max="100" value="14">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+    <!-- 布局 -->
+    <details class="section" open>
+      <summary><span class="sec-ico">🧭</span>摆放方式</summary>
+      <div class="sec-body">
+        <div class="segmented" id="layoutMode">
+          <button data-v="single">单个</button>
+          <button data-v="tile" class="active">平铺</button>
+          <button data-v="random">随机散布</button>
+          <button data-v="bar">底部参数条</button>
+        </div>
+
+        <!-- 单个 -->
+        <div class="layout-sub" id="layoutSingle" hidden>
+          <div class="anchor-grid" id="anchorGrid" title="水印位置"></div>
+          <p class="hint-line">也可以直接在预览图上拖动水印</p>
+        </div>
+
+        <!-- 平铺 -->
+        <div class="layout-sub" id="layoutTile">
+          <div class="field">
+            <label>倾斜角度（度）<output id="tileAngleOut">-30</output></label>
+            <input type="range" id="tileAngle" min="-90" max="90" step="5" value="-30">
+          </div>
+          <div class="field-row">
+            <div class="field grow">
+              <label>横向间距（倍）<output id="gapXOut">1.4</output></label>
+              <input type="range" id="gapX" min="0.2" max="4" step="0.1" value="1.4">
+            </div>
+            <div class="field grow">
+              <label>纵向间距（倍）<output id="gapYOut">2.2</output></label>
+              <input type="range" id="gapY" min="0.2" max="5" step="0.1" value="2.2">
+            </div>
+          </div>
+          <label class="mini-check"><input type="checkbox" id="tileStagger"><span>棋盘式错位排列</span></label>
+        </div>
+
+        <!-- 随机 -->
+        <div class="layout-sub" id="layoutRandom" hidden>
+          <div class="field">
+            <label>数量<output id="randCountOut">14</output></label>
+            <input type="range" id="randCount" min="3" max="60" step="1" value="14">
+          </div>
+          <div class="field">
+            <label>随机扰动幅度<output id="randJitterOut">40</output></label>
+            <input type="range" id="randJitter" min="0" max="100" step="5" value="40">
+          </div>
+          <label class="mini-check"><input type="checkbox" id="randAvoidCenter" checked><span>避开画面中心（保护主体）</span></label>
+        </div>
+
+        <!-- 底部参数条 -->
+        <div class="layout-sub" id="layoutBar" hidden>
+          <div class="field-row">
+            <div class="field grow"><label>厂商 / 品牌</label><input type="text" id="barBrand" placeholder="如 HUAWEI"></div>
+            <div class="field grow"><label>机型</label><input type="text" id="barModel" placeholder="如 P60 Pro"></div>
+          </div>
+          <div class="field">
+            <label>拍摄参数</label>
+            <input type="text" id="barParams" placeholder="如 23mm f/1.4 1/120s ISO50">
+          </div>
+          <div class="field-row">
+            <div class="field grow"><label>日期 / 署名</label><input type="text" id="barDate" placeholder="如 2026.10.06"></div>
+            <button id="btnFillExif" class="tool-btn">从照片信息自动填充</button>
+          </div>
+          <div class="field">
+            <label>条带高度（占图高 %）<output id="barHeightOut">6.5</output></label>
+            <input type="range" id="barHeight" min="3" max="14" step="0.5" value="6.5">
+          </div>
+          <div class="field">
+            <label>条带不透明度<output id="barOpacityOut">55</output></label>
+            <input type="range" id="barOpacity" min="10" max="100" step="5" value="55">
+          </div>
+          <label class="mini-check"><input type="checkbox" id="barLogo" checked><span>使用图片水印作为条带 Logo</span></label>
+        </div>
+
+        <div class="field">
+          <label>整体不透明度<output id="opacityOut">22</output></label>
+          <input type="range" id="opacity" min="3" max="100" step="1" value="22">
+        </div>
+        <div class="field" id="rotateField" hidden>
+          <label>旋转角度（度）<output id="rotateOut">0</output></label>
+          <input type="range" id="rotate" min="-180" max="180" step="1" value="0">
+        </div>
+      </div>
+    </details>
+
+    <!-- 视频运动 -->
+    <details class="section" open>
+      <summary><span class="sec-ico">🎬</span>视频运动<span class="sec-tag" id="videoModeTag">固定</span></summary>
+      <div class="sec-body">
+        <div class="segmented" id="videoMode">
+          <button data-v="fixed" class="active">固定</button>
+          <button data-v="float">漂浮</button>
+          <button data-v="hop">跳位</button>
+        </div>
+        <div class="layout-sub" id="videoFixedHint" hidden>
+          <p class="hint-line">位置与「摆放方式 → 单个」的九宫格一致，浓度用「整体不透明度」调节。</p>
+        </div>
+        <div class="layout-sub" id="videoFloat" hidden>
+          <div class="field">
+            <label>漂移幅度（占可用空间 %）<output id="vidAmpOut">35</output></label>
+            <input type="range" id="vidAmp" min="10" max="90" step="5" value="35">
+          </div>
+          <div class="field">
+            <label>漂移速度（倍）<output id="vidSpeedOut">1.0</output></label>
+            <input type="range" id="vidSpeed" min="0.2" max="3" step="0.1" value="1">
+          </div>
+          <p class="hint-line">水印沿永不重复的曲线缓慢游动，位置与角度随时间连续变化。</p>
+        </div>
+        <div class="layout-sub" id="videoHop" hidden>
+          <div class="field">
+            <label>平均停留间隔（秒）<output id="vidHopOut">6</output></label>
+            <input type="range" id="vidHop" min="2" max="15" step="1" value="6">
+          </div>
+          <label class="mini-check"><input type="checkbox" id="vidHopSmooth" checked><span>换位时平滑过渡（约 0.8 秒）</span></label>
+          <p class="hint-line">不定时跳到随机位置：停留间隔与落点都带随机，避免被按规律定位去除。</p>
+        </div>
+        <p class="foot-note">视频为实时录制导出（1 分钟视频约需 1 分钟），输出 MP4 或 WebM 视浏览器支持；导出设置中的格式 / 尺寸 / 质量仅对图片生效。</p>
+      </div>
+    </details>
+
+    <!-- 导出 -->
+    <details class="section" open>
+      <summary><span class="sec-ico">📦</span>导出</summary>
+      <div class="sec-body">
+        <div class="field-row">
+          <div class="field grow">
+            <label>输出格式</label>
+            <select id="expFormat">
+              <option value="keep">与原格式一致</option>
+              <option value="image/jpeg">JPG</option>
+              <option value="image/png">PNG</option>
+              <option value="image/webp">WebP</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>长边限制</label>
+            <select id="expResize">
+              <option value="0">原始尺寸</option>
+              <option value="1080">1080px</option>
+              <option value="1440">1440px</option>
+              <option value="2048">2048px</option>
+              <option value="2560">2560px</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>JPG / WebP 质量<output id="expQualityOut">92</output></label>
+          <input type="range" id="expQuality" min="40" max="100" step="1" value="92">
+        </div>
+        <div class="field-row">
+          <div class="field grow">
+            <label>文件名前缀</label>
+            <input type="text" id="expPrefix" placeholder="可选">
+          </div>
+          <label class="mini-check nowrap"><input type="checkbox" id="expExif"><span>保留拍摄信息</span></label>
+        </div>
+        <div class="export-btns">
+          <button id="btnExportZip" class="primary-btn" disabled>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 16 6 10l1.4-1.4L11 12.2V4h2v8.2l3.6-3.6L18 10l-6 6zm-7 4v-5h2v3h10v-3h2v5H5z"/></svg>
+            导出全部（ZIP）
+          </button>
+          <button id="btnExportCurrent" class="ghost-btn" disabled>仅当前这张</button>
+        </div>
+        <p class="foot-note">默认清除照片位置等隐私信息；勾选「保留拍摄信息」则原样保留。</p>
+      </div>
+    </details>
+
+  </aside>
+</main>
+
+<!-- Toast -->
+<div id="toast" hidden></div>
+
+<!-- 导出进度 -->
+<div class="progress-overlay" id="progressOverlay" hidden>
+  <div class="progress-card">
+    <p id="progressText">正在处理…</p>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+    <button id="btnCancelExport" class="ghost-btn">取消</button>
+  </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/exif.js"></script>
+<script src="js/zip.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/presets.js"></script>
+<script src="js/video.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
